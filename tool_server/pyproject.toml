@@ -1,0 +1,22 @@
+[project]
+name = "tool-server"
+version = "0.1.0"
+description = "toolserver für Pre and Postprocessing"
+authors = [
+    {name = "Kai Weber"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "fastapi (>=0.120.2,<0.121.0)",
+    "uvicorn (>=0.38.0,<0.39.0)",
+    "spacy (>=3.8.7,<4.0.0)",
+    "python-docx (>=1.2.0,<2.0.0)",
+    "pydantic (>=2.12.3,<3.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

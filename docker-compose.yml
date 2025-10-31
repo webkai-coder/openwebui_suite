@@ -1,0 +1,64 @@
+
+services:
+  # --- 1. OLLAMA (lokaler Modellserver) ---
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+
+  # --- 2. TOOL-SERVER  ---
+  tool_server:
+    build:
+      context: ./tool_server
+    container_name: tool_server
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./tool_server:/app
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+
+  # --- 3. OPENWEBUI (Frontend) ---
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:ollama
+    container_name: openwebui
+    depends_on:
+      - ollama
+      - tool_server
+    ports:
+      - "3000:8080"
+    environment:
+      # Verbindung zu Ollama
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      # Verbindung zum Tool-Server
+      - TOOL_SERVER_URL=http://tool_server:8000
+    volumes:
+      - openwebui_data:/app/backend/data
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+
+# --- VOLUMES ---
+volumes:
+  openwebui_data:
+  ollama_data:
+
+networks:
+  default:
+    name: openwebui_suite_default

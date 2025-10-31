@@ -1,0 +1,23 @@
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:ollama
+    container_name: openwebui
+    ports:
+      - "3000:8080"
+    volumes:
+      - openwebui_data:/app/backend/data
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    restart: unless-stopped
+
+volumes:
+  openwebui_data:
+
+networks:
+  default:
+    name: openwebui_suite_default

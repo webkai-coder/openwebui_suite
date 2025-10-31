@@ -1,0 +1,16 @@
+services:
+  tool_server:
+    build:
+      context: .
+    container_name: tool_server
+    ports:
+      - "8000:8000"
+    volumes:
+    - ./tool_server:/app
+    environment:
+    - CORS_ALLOW_ORIGIN=http://localhost:3000   # optional
+    restart: unless-stopped
+
+networks:
+  default:
+    name: openwebui_suite_default

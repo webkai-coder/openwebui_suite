@@ -1,0 +1,39 @@
+{
+  "folders": [
+    { "path": "." },
+
+  ],
+  "settings": {
+    // Einheitliche Einrückung
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+
+    // YAML-Formatierung & Fehlerprüfung
+    "yaml.validate": true,
+    "yaml.format.enable": true,
+    "yaml.schemas": {
+      "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": [
+        "docker-compose.yml"
+      ]
+    },
+
+    // Prettier oder Standard-Formatter
+    "[yaml]": {
+      "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+
+    // Docker-Unterstützung
+    "docker.composeCommand": "docker compose",
+    "files.eol": "\n",
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "containers.composeCommand": "docker compose"
+  },
+  "extensions": {
+    "recommendations": [
+      "redhat.vscode-yaml",
+      "ms-azuretools.vscode-docker",
+      "esbenp.prettier-vscode"
+    ]
+  }
+}
