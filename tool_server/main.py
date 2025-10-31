@@ -1,6 +1,10 @@
+import copy
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+
+from tools.scrub import router as scrub_router, tool_spec as scrub_spec
 
 app = FastAPI(title="Local Tool Server", version="1.0")
 
@@ -13,36 +17,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- Input/Output Schemas ---
-class TextIn(BaseModel):
-    text: str
+app.include_router(scrub_router)
 
-class TextOut(BaseModel):
-    clean_text: str
+BASE_URL = os.getenv("TOOL_SERVER_BASE_URL", "http://localhost:8000")
 
-# --- Haupttool ---
-@app.post("/scrub", response_model=TextOut, summary="Scrub Text")
-def scrub_text(data: TextIn):
-    cleaned = data.text.replace("Kai", "[REDACTED_NAME]")
-    return {"clean_text": cleaned}
 
 # --- Tool-Spezifikation für OpenWebUI ---
 @app.get("/toolspec")
 def get_toolspec():
-    return {
-        "tools": [
-            {
-                "name": "scrub",
-                "description": "Entfernt persönliche Daten aus Texten.",
-                "parameters": {
-                    "text": {"type": "string", "description": "Zu bereinigender Text"}
-                },
-                "endpoint": "/scrub",
-                "method": "POST",
-                "output_key": "clean_text",
-            }
-        ]
-    }
+    spec = copy.deepcopy(scrub_spec)
+    if not spec["endpoint"].startswith("http"):
+        spec["endpoint"] = f"{BASE_URL}{spec['endpoint']}"
+    spec.setdefault("base_url", BASE_URL)
+    return {"tools": [spec]}
+
+
 @app.get("/")
 def root():
-    return {"status": "Tool Server running", "toolspec": "/toolspec"}
+    return {"status": "Tool Server running", "toolspec": "/toolspec", "base_url": BASE_URL}
